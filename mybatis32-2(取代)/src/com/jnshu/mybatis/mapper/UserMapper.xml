@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--写sql语句-->
+<mapper namespace="com.jnshu.mybatis.mapper.UserMapper">
+	<sql id="selector">
+		select*from user
+	</sql>
+    <!-- 通过ID查询一个用户 -->
+    <select id="findUserByID" parameterType="Integer" resultType="User">
+    	<include refid="selector"/> where id=#{v}   
+    </select>
+    <!-- //更具用户名模糊查询用户列表
+    #{} select*from user where id=? =='五'占位符
+    ${} select*from user where username like '%五%'字符串拼接
+     -->
+    <select id="findUserByUsername" parameterType="String" resultType="com.jnshu.mybatis.pojo.User">
+        <!-- select*from user where username like '%${value}%' -->
+        <include refid="selector"/> where username like "%"#{fuck}"%"<!-- fuck是随便写的 -->
+    </select>
+    <!-- 添加用户 -->
+    <insert id="insertUser" parameterType="com.jnshu.mybatis.pojo.User">
+    	<selectKey keyProperty="id" resultType="Integer" order="AFTER">
+    		select LAST_INSERT_ID()
+    	</selectKey>
+    	insert into user(username,birthday,address,sex) values(#{username},#{birthday},#{address},#{sex})
+    </insert>
+    <!-- 更新 -->
+    <update id="updateUserByID" parameterType="com.jnshu.mybatis.pojo.User">
+    	update user set username=#{username},sex=#{sex},birthday=#{birthday},address=#{address} where id=#{id}
+    </update>
+    <!-- 删除 -->
+    <delete id="deleteUserByID" parameterType="Integer">
+    	delete from user where id=#{v}
+    </delete>
+    <!-- 根据用户的名模糊查询 -->
+    <select id="findUserByQueryVo" parameterType="QueryVo" resultType="com.jnshu.mybatis.pojo.User">
+        <!-- select*from user where username like '%${value}%' -->
+        <include refid="selector"/> where username like "%"#{user.username}"%"
+    </select>
+    
+    <select id="countUser" resultType="Integer">
+    	select count(1) from user
+    </select>
+    <!-- 根据性别和名字查询用户  where可以去掉第一个前and-->
+    <select id="selectUserBySexAndUsername" parameterType="User" resultType="User">
+    	<include refid="selector"/>
+    	<where>    	
+	    	<if test="sex!=null and sex!=''">
+	    		sex=#{sex} 
+	    	</if>
+	    	<if test="username!=null and username!=''">
+	    		and username=#{username}
+	    	</if>
+    	</where>
+    </select>
+    
+    <!-- 多个id (1,2,3)-->
+    <select id="selectUserByIDs" parameterType="QueryVo" resultType="User">
+    	<include refid="selector"/>
+    	<where>  <!-- collection="array"1号 "list"2号"ids"3号-->	
+    		<foreach collection="list" item="id" separator="," open="id in(" close=")">
+    			#{id}
+    		</foreach>
+    	</where>
+    </select>
+    
+</mapper>

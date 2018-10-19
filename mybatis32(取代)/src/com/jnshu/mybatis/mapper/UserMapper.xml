@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--写sql语句-->
+<mapper namespace="com.jnshu.mybatis.mapper.UserMapper">
+    <!-- 通过ID查询一个用户 -->
+    <select id="findUserByID" parameterType="Integer" resultType="User">
+    	select*from user where id=#{v}   
+    </select>
+    <!-- //更具用户名模糊查询用户列表
+    #{} select*from user where id=? =='五'占位符
+    ${} select*from user where username like '%五%'字符串拼接
+     -->
+    <select id="findUserByUsername" parameterType="String" resultType="com.jnshu.mybatis.pojo.User">
+        <!-- select*from user where username like '%${value}%' -->
+        select*from user where username like "%"#{fuck}"%"<!-- fuck是随便写的 -->
+    </select>
+    <!-- 添加用户 -->
+    <insert id="insertUser" parameterType="com.jnshu.mybatis.pojo.User">
+    	<selectKey keyProperty="id" resultType="Integer" order="AFTER">
+    		select LAST_INSERT_ID()
+    	</selectKey>
+    	insert into user(username,birthday,address,sex) values(#{username},#{birthday},#{address},#{sex})
+    </insert>
+    <!-- 更新 -->
+    <update id="updateUserByID" parameterType="com.jnshu.mybatis.pojo.User">
+    	update user set username=#{username},sex=#{sex},birthday=#{birthday},address=#{address} where id=#{id}
+    </update>
+    <!-- 删除 -->
+    <delete id="deleteUserByID" parameterType="Integer">
+    	delete from user where id=#{v}
+    </delete>
+</mapper>
